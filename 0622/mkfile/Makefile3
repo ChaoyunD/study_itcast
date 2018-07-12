@@ -1,0 +1,21 @@
+SRC=main.c add.c sub.c
+OBJ=main.o add.o sub.o
+TARGET=main
+#$@:目标
+#$<:第一个依赖
+#$^:全部依赖
+$(TARGET):$(OBJ)
+	gcc -o $@ $^
+add.o:add.c
+	gcc -c -o $@ $<
+main.o:main.c
+	gcc -c -o $@ $<
+sub.o:sub.c
+	gcc -c -o $@ $<
+clean:
+	rm -f $(OBJ)
+	rm -f $(TARGET)
+distclean:clean
+	rm -f a.out *.~
+#伪目标：需要把那些不对应具体文件的目标，声明为伪目标
+.PHONY:clean 

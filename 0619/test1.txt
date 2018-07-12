@@ -1,0 +1,4 @@
+drwxrwxr-x 3 itcast itcast   4096 6月  19 14:45 aa
+-rwxr-xr-x 1 itcast itcast 133792 6月  19 14:51 ls
+drwxrwxr-x 5 itcast itcast   4096 6月  19 15:03 test
+-rw-rw-r-- 1 itcast itcast      0 6月  19 15:49 test.txt

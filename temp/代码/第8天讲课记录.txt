@@ -1,0 +1,73 @@
+守护进程的特点:
+	1 是后台服务进程
+	2 周期性的执行某些任务
+	3 独立于控制终端, 不受控制终端的影响
+	4 不受用户注销和登录的影响
+	5 一般以d结尾
+	
+进程组和会话:
+	进程组: 多个进程组成了一个进程组, 如: 父进程fork出几个子进程, 多个子进程和父进程
+	   		在一个组里, 组长是父进程, 组ID是父进程的PID
+	会话: 多个进程组构成一个会话, ps -ajx
+	可以通过使用kill -9 -进程组ID
+	
+	创建会话的进程不能是进程组组长, 一般父进程fork子进程, 然后父进程退出, 由子进程调用setsid函数
+	创建会话.
+	
+创建守护进程的步骤:
+	1 父进程fork子进程, 然后父进程退出
+	2 子进程调用setsid函数创建一个会话
+	3 改变当前的工作目录chdir---->不是必须
+	4 设置文件掩码-umask---->不是必须
+	5 关闭标准输入 标准输出和标准错误输出文件描述符---->不是必须
+	6 核心操作
+	
+编写一个守护进程，每隔2S钟获取一次系统时间，并将这个时间写入磁盘文件。
+分析:
+	1 编写守护进程模型的步骤
+	2 每个2秒--->使用setitimer 
+	3 setitimer发送SIGALRM信号,需要捕获SIGARLM信号---->signal或者sigaction
+	4 获取系统时间--->time()--->ctime()-将time_t类型转换为字符串
+	5 写磁盘文件操作,open  write  close
+
+初级版本的问题:
+	1 在信号处理函数中有频繁打开和关闭文件的操作.
+	2 如何解决文件太大的问题.   rename
+	
+创建子线程:
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                          void *(*start_routine) (void *), void *arg);
+                          
+创建线程传递参数: 子线程不能共享栈空间内存, 但是如果栈内存的生存周期跟进程是一样的, 
+同样也可以作为参数传递给子线程 .
+
+pthread_exit: 线程退出, 若主线程调用这个函数不会使整个进程退出
+pthread_join:  等待回收子线程, 是一个阻塞函数
+
+pthread_detach: 设置子线程为分离状态
+
+pthread_cancel: 取消线程
+pthread_testcancel: 设置取消点
+
+在创建子线程的时候设置线程属性为分离状态
+	1 pthread_attr_t attr;
+	2 pthread_attr_init(&attr);
+	3 pthread_attr_set_detachstate(&attr, PTHREAD_CREATE_DETACHED);    
+	4 pthread_create(&thread, &attr, mythread, NULL);  
+	5 pthread_attr_destroy(&attr); 
+	
+互斥锁的使用:
+	1 定义一把锁
+		pthread_mutex_t mutex;
+	2 初始化互斥锁
+		pthread_mutex_init(&mutex, NULL);
+	3 在子线程中的共享资源出现的位置之前加锁, 之后解锁
+		pthread_mutex_lock(&mutex);
+		/////
+			共享资源
+		////  
+		pthread_mutex_unlock(&mutex);  
+		
+	4 释放互斥锁
+		pthread_mutex_destroy(&mutex);          
+	

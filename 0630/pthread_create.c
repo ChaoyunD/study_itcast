@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <sys/mman.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <pthread.h>
+void *mythread(void *arg)
+{
+    printf("[%d]:[%ld]\n",*(int *)arg,pthread_self());
+}
+int main()
+{
+    int ret;
+    int i=0;
+    int arr[5];
+    pthread_t thread[5];
+    for(i=0;i<5;i++)
+    {
+        arr[i]=i;
+        ret=pthread_create(&thread[i],NULL,mythread,(void *)&arr[i]);
+    }
+    sleep(1);
+    return 0;
+}

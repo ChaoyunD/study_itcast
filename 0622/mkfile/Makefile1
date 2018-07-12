@@ -1,0 +1,16 @@
+
+main:add.o main.o sub.o
+	gcc -o main add.o main.c
+add.o:add.c
+	gcc -c -o add.o add.c
+main.o:main.c
+	gcc -c -o main.o main.c
+sub.o:sub.c
+	gcc -c -o sub.o sub.c
+clean:
+	rm -f add.o main.o sub.o
+	rm -f main
+distclean:clean
+	rm -f a.out *.~
+#伪目标：需要把那些不对应具体文件的目标，声明为伪目标
+.PHONY:clean 
